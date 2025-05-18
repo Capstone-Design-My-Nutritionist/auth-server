@@ -2,7 +2,6 @@ package com.example.myNutrition.domain.user.service;
 
 
 import com.example.myNutrition.common.exception.BadRequestException;
-import com.example.myNutrition.common.exception.NotFoundException;
 import com.example.myNutrition.domain.user.dto.NicknameUpdateRequestDto;
 import com.example.myNutrition.domain.user.dto.PasswordCheckRequestDto;
 import com.example.myNutrition.domain.user.dto.PasswordUpdateRequestDto;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserJoinService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
