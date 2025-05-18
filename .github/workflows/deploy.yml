@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
 
       - name: Build Auth Server
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
