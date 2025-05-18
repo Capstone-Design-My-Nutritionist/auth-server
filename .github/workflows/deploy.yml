@@ -2,7 +2,7 @@ name: CI/CD Deploy for Auth Server
 
 on:
   push:
-    branches: [ main ]
+    branches: [ init ]
 
 jobs:
   build-and-deploy:
