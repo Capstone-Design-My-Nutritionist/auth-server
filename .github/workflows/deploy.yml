@@ -56,5 +56,5 @@ jobs:
           script: |
             cd ~/backend-resources
             docker pull gisu1102/my-nutrition-auth:latest
-            docker compose -f docker-compose-auth.prod.yml down
-            docker compose -f docker-compose-auth.prod.yml up -d
+            docker-compose -f docker-compose-auth.prod.yml down
+            docker-compose -f docker-compose-auth.prod.yml up -d
