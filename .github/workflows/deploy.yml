@@ -1,0 +1,60 @@
+name: CI/CD Deploy for Auth Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code with submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUB_TOKEN }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Auth Server
+        run: ./gradlew build -x test
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Auth Image
+        run: |
+          docker build -t gisu1102/my-nutrition-auth:latest .
+          docker push gisu1102/my-nutrition-auth:latest
+
+      - name: Copy docker-compose-auth.prod.yml to EC2 (Auth Server)
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AUTH_EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: "src/main/resources/docker-compose-auth.prod.yml"
+          target: "/home/ubuntu/backend-resources/"
+          strip_components: 3
+
+      - name: Deploy Auth Server via SSH on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AUTH_EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/backend-resources
+            docker pull gisu1102/my-nutrition-auth:latest
+            docker compose -f docker-compose-auth.prod.yml down
+            docker compose -f docker-compose-auth.prod.yml up -d
